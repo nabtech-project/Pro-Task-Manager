@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "https://your-render-url.onrender.com/api";
+const API = "https://pro-task-manager.onrender.com/";
 
 function App() {
     const [token, setToken] = useState(localStorage.getItem("token"));
