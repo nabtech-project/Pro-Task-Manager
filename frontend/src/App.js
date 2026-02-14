@@ -1,28 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-const API = "https://pro-task-manager.onrender.com/";
+const API = "https://pro-task-manager.onrender.com/api";
 
 function App() {
     const [token, setToken] = useState(localStorage.getItem("token"));
     const [tasks, setTasks] = useState([]);
     const [title, setTitle] = useState("");
 
-    useEffect(() => {
-        if (token) fetchTasks();
-    }, [token]);
+    const fetchTasks = useCallback(async () => {
+        if (!token) return;
 
-    const fetchTasks = async () => {
         const res = await axios.get(`${API}/tasks`, {
             headers: { Authorization: token }
         });
+
         setTasks(res.data);
-    };
+    }, [token]);
+
+    useEffect(() => {
+        fetchTasks();
+    }, [fetchTasks]);
 
     const addTask = async () => {
         await axios.post(`${API}/tasks`, { title }, {
             headers: { Authorization: token }
         });
+
         setTitle("");
         fetchTasks();
     };
@@ -34,7 +38,12 @@ function App() {
     return (
         <div style={{ padding: 40 }}>
             <h1>Pro Task Manager</h1>
-            <input value={title} onChange={e => setTitle(e.target.value)} />
+
+            <input
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+            />
+
             <button onClick={addTask}>Add</button>
 
             {tasks.map(task => (
@@ -46,7 +55,9 @@ function App() {
             <button onClick={() => {
                 localStorage.removeItem("token");
                 setToken(null);
-            }}>Logout</button>
+            }}>
+                Logout
+            </button>
         </div>
     );
 }
@@ -64,8 +75,18 @@ function Auth({ setToken }) {
     return (
         <div style={{ padding: 40 }}>
             <h2>Login</h2>
-            <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-            <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+
+            <input
+                placeholder="Email"
+                onChange={e => setEmail(e.target.value)}
+            />
+
+            <input
+                type="password"
+                placeholder="Password"
+                onChange={e => setPassword(e.target.value)}
+            />
+
             <button onClick={login}>Login</button>
         </div>
     );
